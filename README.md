@@ -2,8 +2,7 @@
 
 [![PyPI version](https://badge.fury.io/py/flask-taler.svg)](https://badge.fury.io/py/flask-taler)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://travis-ci.com/your-repo/flask-taler.svg?branch=main)](https://travis-ci.com/your-repo/flask-taler)
-[![Code Coverage](https://codecov.io/gh/your-repo/flask-taler/branch/main/graph/badge.svg)](https://codecov.io/gh/your-repo/flask-taler)
+
 
 `Flask-Taler` is a Flask extension that simplifies the integration of [GNU Taler](https://taler.net/), a privacy-preserving electronic payment system, into your Flask web applications. This extension provides a convenient way to create payment orders, handle payment redirects, process refunds, and manage callbacks from the Taler system.
 
