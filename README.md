@@ -7,6 +7,10 @@
 
 `Flask-Taler` is a Flask extension that simplifies the integration of [GNU Taler](https://taler.net/), a privacy-preserving electronic payment system, into your Flask web applications. This extension provides a convenient way to create payment orders, handle payment redirects, process refunds, and manage callbacks from the Taler system.
 
+
+> NOT READY FOR RELEASE
+
+
 ## Features
 
 *   **Easy Order Creation:**  Create Taler payment orders with just a few lines of code.

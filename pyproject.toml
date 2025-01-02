@@ -1,0 +1,26 @@
+[project]
+name = "flask-taler"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Stefane Fermigier", email = "sf@abilian.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "flask>=3.1.0",
+    "requests>=2.32.3",
+]
+
+[project.scripts]
+flask-taler = "flask_taler:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "abilian-devtools>=0.7.6",
+    "requests-mock>=1.12.1",
+]
