@@ -1,4 +1,3 @@
-from flask import _app_ctx_stack as stack
 import requests
 from urllib.parse import urljoin
 
@@ -18,8 +17,6 @@ class Taler(object):
 
     def init_app(self, app):
         """Initialize the extension with the Flask app."""
-        app.teardown_appcontext(self.teardown)
-
         # Load configuration from Flask app's config
         self.exchange_url = app.config['TALER_EXCHANGE_URL']
         self.merchant_backend_url = app.config['TALER_MERCHANT_BACKEND_URL']
@@ -27,15 +24,8 @@ class Taler(object):
         self.default_currency = app.config.get('TALER_DEFAULT_CURRENCY', self.default_currency)
         # ... other configuration parameters
 
-        # (Optional) Register extension with app for potential later use
-        if not hasattr(app, 'extensions'):
-            app.extensions = {}
+        # Register the extension with the app
         app.extensions['taler'] = self
-
-    def teardown(self, exception):
-        """Cleanup resources, if needed."""
-        ctx = stack.top
-        # ... any teardown logic
 
     def create_order(self, amount, currency=None, order_id=None, product_description=None, fulfillment_url=None,
                      metadata=None):
@@ -97,46 +87,47 @@ class Taler(object):
 
         match response.status_code:
             case 200:
-                order_data = response.json()
-                return order_data.get('payment_redirect_url')
+                return response.json()
             case 404:
                 print(f"Order {order_id} not found.")
                 return None
             case _:
-                print(f"Error retrieving payment URL for order {order_id}: {response.status_code}")
+                print(f"Error processing refund for order {order_id}: {response.status_code}")
                 response.raise_for_status()
 
-    def process_refund(self, order_id, amount=None):
-        """
-        Initiates a refund for a given order ID.
 
-        Args:
-            order_id (str): The ID of the order to refund.
-            amount (float, optional): The amount to refund. If None, a full refund is issued.
+def process_refund(self, order_id, amount=None):
+    """
+    Initiates a refund for a given order ID.
 
-        Returns:
-            dict: The refund response from the Taler backend.
-        """
-        headers = {
-            'Accept': 'application/json',
-            'Authorization': f'Basic {self.merchant_api_key}',
-            'Content-Type': 'application/json',
-        }
+    Args:
+        order_id (str): The ID of the order to refund.
+        amount (float, optional): The amount to refund. If None, a full refund is issued.
 
-        refund_data = {}
-        if amount is not None:
-            refund_data['amount'] = str(amount)  # Convert to string
+    Returns:
+        dict: The refund response from the Taler backend.
+    """
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': f'Basic {self.merchant_api_key}',
+        'Content-Type': 'application/json',
+    }
 
-        url = urljoin(self.merchant_backend_url, f'/private/orders/{order_id}/refund')
-        response = requests.post(url, headers=headers, json=refund_data)
+    refund_data = {}
+    if amount is not None:
+        refund_data['amount'] = str(amount)  # Convert to string
 
-        if response.status_code == 200:
+    url = urljoin(self.merchant_backend_url, f'/private/orders/{order_id}/refund')
+    response = requests.post(url, headers=headers, json=refund_data)
+
+    match response.status_code:
+        case 200:
             return response.json()
-        elif response.status_code == 404:
+        case 404:
             print(f"Order {order_id} not found.")
             return None
-        else:
+        case _:
             print(f"Error processing refund for order {order_id}: {response.status_code}")
             response.raise_for_status()
 
-    # ... other methods for handling callbacks, webhooks, wallet operations, etc.
+# ... other methods for handling callbacks, webhooks, wallet operations, etc.
